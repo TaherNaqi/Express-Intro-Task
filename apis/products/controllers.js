@@ -1,7 +1,9 @@
 let products = require("../../products");
-exports.fetch = (req, res) => {
+const Product = require("../../db/models/Product");
+exports.fetch = async (req, res) => {
   try {
-    res.json(products);
+    const productArray = await Product.find();
+    res.json(productArray);
   } catch (error) {
     res.json({ message: error });
   }
