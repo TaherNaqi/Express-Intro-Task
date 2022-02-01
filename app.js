@@ -1,15 +1,12 @@
 const express = require("express");
 const app = express();
 const connectDB = require("./db/database");
-const PORT = 8000;
 const productRoutes = require("./apis/products/routes");
 const { logger, errorHandler, notFoundPage } = require("./middleware/logger");
 app.use(express.json());
 app.use(logger);
-
 app.use("/api/products", productRoutes);
 app.use(errorHandler);
-
 app.use(notFoundPage);
 
 connectDB();
