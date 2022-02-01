@@ -1,5 +1,13 @@
 const Product = require("../../db/models/Product");
-exports.fetch = async (req, res, next) => {
+exports.fetchProduct = async (productId, next) => {
+  try {
+    const product = await Product.findById(productId);
+    return product;
+  } catch (error) {
+    next(error);
+  }
+};
+exports.productList = async (req, res, next) => {
   try {
     const productArray = await Product.find({}).select(
       "name description price color"
@@ -11,7 +19,7 @@ exports.fetch = async (req, res, next) => {
     next(error);
   }
 };
-exports.addproduct = async (req, res) => {
+exports.addproduct = async (req, res, next) => {
   try {
     //req.body.id = products.length + 1
     const newProduct = await Product.create(req.body);
@@ -21,26 +29,24 @@ exports.addproduct = async (req, res) => {
   }
 };
 
-exports.deleteproduct = async (req, res) => {
+exports.deleteproduct = async (req, res, next) => {
   try {
-    const { productId } = req.params;
-    const foundProduct = await Product.findByIdAndDelete({ _id: productId });
-    if (foundProduct) res.status(204).end();
-    else next({ status: 404, message: "Product not found" });
+    await Product.findByIdAndDelete({
+      _id: req.product.id,
+    });
+    res.status(204).end();
   } catch (error) {
     next(error);
   }
 };
-exports.updateProduct = async (req, res) => {
+exports.updateProduct = async (req, res, next) => {
   try {
-    const { productId } = req.params;
-    const product = await Product.findByIdAndUpdate(
-      { _id: productId },
+    const foundProduct = await Product.findByIdAndUpdate(
+      { _id: req.product.id },
       req.body,
       { new: true, runValidators: true }
     );
-    if (product) res.status(200).json(product);
-    else next({ status: 404, message: "Product not found" });
+    res.status(200).json(foundProduct);
   } catch (error) {
     next(error);
   }
